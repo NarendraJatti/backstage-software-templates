@@ -1,0 +1,88 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: s3-bucket-terraform
+  title: S3 Bucket with Terraform
+  description: Creates an S3 bucket using Terraform and GitHub Actions
+  tags:
+    - aws
+    - s3
+    - terraform
+    - infrastructure
+
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: Bucket Information
+      required:
+        - component_id
+        - bucket_name
+      properties:
+        component_id:
+          title: Component ID
+          type: string
+          description: Unique identifier for this component
+        bucket_name:
+          title: S3 Bucket Name
+          type: string
+          description: Globally unique name for the S3 bucket
+        region:
+          title: AWS Region
+          type: string
+          description: AWS region to deploy the bucket to
+          default: us-east-1
+        versioning:
+          title: Enable Versioning
+          type: boolean
+          description: Whether to enable versioning for the bucket
+          default: false
+
+    - title: GitHub Repository Information
+      required:
+        - repo_url
+      properties:
+        repo_url:
+          title: GitHub Repository URL
+          type: string
+          description: Location of the GitHub repository to create
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./template
+        values:
+          component_id: ${{ parameters.component_id }}
+          bucket_name: ${{ parameters.bucket_name }}
+          region: ${{ parameters.region }}
+          versioning: ${{ parameters.versioning }}
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: "Terraform configuration for S3 bucket ${{ parameters.bucket_name }}"
+        repoUrl: ${{ parameters.repo_url }}
+
+    - id: github-actions
+      name: Add GitHub Actions
+      action: github:actions:dispatch
+      input:
+        repoUrl: ${{ parameters.repo_url }}
+        workflowId: terraform.yml
+        branch: main
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in GitHub
+        url: ${{ steps.publish.output.remoteUrl }}/blob/main/README.md
