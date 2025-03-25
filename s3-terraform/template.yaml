@@ -70,7 +70,7 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: "Terraform configuration for S3 bucket ${{ parameters.bucket_name }}"
-        repoUrl: test123
+        repoUrl: ${{ parameters.repo_url }}
 
     - id: github-actions
       name: Add GitHub Actions
