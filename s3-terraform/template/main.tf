@@ -7,11 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region     = "us-east-1"  # Hardcoded region
-  access_key = "AKIA6GBMFAZTZ5NBZWBS"  # Hardcoded access key
-  secret_key = "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"  # Hardcoded secret
-}
 
 resource "aws_s3_bucket" "this" {
   bucket = "${{ values.bucket_name }}"
