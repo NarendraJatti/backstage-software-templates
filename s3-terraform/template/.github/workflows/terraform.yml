@@ -1,61 +1,71 @@
-name: Terraform
+name: Terraform S3 Bucket Deployment
 
 on:
+  workflow_dispatch: {}  # Allow manual triggers
   push:
-    branches: [ "master" ]
+    branches: [ "master" ]  # Match your default branch
   pull_request:
     branches: [ "master" ]
-  workflow_dispatch:
 
+# Required permissions for OIDC (recommended) or token-based auth
 permissions:
-  contents: read
-  id-token: write
+  id-token: write  # For OIDC (preferred)
+  contents: read   # To checkout code
+  actions: write   # To dispatch workflows (if chaining)
 
 env:
-  TF_VERSION: 1.6.0
-  AWS_REGION: ${{ secrets.AWS_REGION }}
+  TF_VERSION: "1.6.0"  # Terraform version
+  AWS_REGION: "us-east-1"  # Default region
 
 jobs:
   terraform:
-    name: Terraform
+    name: "Terraform Plan & Apply"
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # Install Terraform
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ env.TF_VERSION }}
+          terraform_version: "${{ env.TF_VERSION }}"
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-
+      # Initialize Terraform
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -input=false
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Only for testing!
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      # Check formatting
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive
+
+      # Validate config
       - name: Terraform Validate
         id: validate
         run: terraform validate
 
+      # Generate execution plan
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false
+        run: |
+          terraform plan -no-color -input=false \
+          -out=tfplan          
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        continue-on-error: false
 
+      # Apply changes (only on master push)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false tfplan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
