@@ -15,7 +15,7 @@ provider "aws" {
 
 
 resource "aws_s3_bucket" "this" {
-  bucket = "${{ values.bucket_name }}"
+  bucket = var.bucket_name
   
   tags = {
     Name        = "${{ values.bucket_name }}"
