@@ -78,7 +78,7 @@ spec:
       input:
         repoUrl: ${{ parameters.repo_url }}
         workflowId: terraform.yml
-        branchOrTagName: "main"
+        branchOrTagName: "master"
         
 
   output:
