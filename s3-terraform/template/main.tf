@@ -13,27 +13,8 @@ provider "aws" {
   secret_key = "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG"
 }
 
-resource "aws_s3_bucket" "this" {
-  bucket = var.bucket_name
+data "aws_s3_buckets" "current" {}
 
-  tags = {
-    Name        = var.bucket_name
-    Environment = "Production"
-    ManagedBy   = "Backstage"
-  }
-}
-
-resource "aws_s3_bucket_versioning" "this" {
-  bucket = aws_s3_bucket.this.id
-  versioning_configuration {
-    status = var.versioning_enabled ? "Enabled" : "Disabled"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "this" {
-  bucket                  = aws_s3_bucket.this.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+output "bucket_list" {
+  value = data.aws_s3_buckets.current.buckets[*].name
 }
