@@ -7,8 +7,11 @@ terraform {
   }
 }
 
-# Use variables instead of hardcoding
 variable "bucket_name" {
+  type = string
+}
+
+variable "s3_bucket_name" {
   type = string
 }
 
@@ -19,12 +22,12 @@ variable "versioning_enabled" {
 
 provider "aws" {
   region     = "us-east-1"
-  access_key = "AKIA3IJ74JHWC62ZBTCH"       # ⚠️ Remove in production
-  secret_key = "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG" # ⚠️ Remove in production
+  access_key = "AKIA3IJ74JHWC62ZBTCH"       # ⚠️ Exposed for testing purposes
+  secret_key = "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG" # ⚠️ Exposed for testing purposes
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = var.s3_bucket_name  # ← Use Terraform variable
+  bucket = var.s3_bucket_name
   
   tags = {
     Name        = var.bucket_name
@@ -36,7 +39,7 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_bucket_versioning" "this" {
   bucket = aws_s3_bucket.this.id
   versioning_configuration {
-    status = var.versioning_enabled ? "Enabled" : "Disabled"  # ← Proper ternary
+    status = var.versioning_enabled ? "Enabled" : "Disabled"
   }
 }
 
