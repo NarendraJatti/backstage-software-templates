@@ -1,19 +1,30 @@
-name: List S3 Buckets
+name: Create S3 Bucket
 
 on:
-  workflow_dispatch: {}  # Manual trigger
+  workflow_dispatch: {}
   push:
-    branches: [ main, master ]  # Auto-trigger on push
+    branches: [ main, master ]
 
 jobs:
-  list-buckets:
+  create-bucket:
     runs-on: ubuntu-latest
     steps:
-      - name: Configure AWS Credentials
-        env:
-          AWS_ACCESS_KEY_ID: "AKIA3IJ74JHWC62ZBTCH"
-          AWS_SECRET_ACCESS_KEY: "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"
-          AWS_REGION: "us-east-1"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
         run: |
-          echo "=== S3 Bucket List ==="
-          aws s3 ls
+          terraform apply -auto-approve
+          echo "=== Created Bucket ==="
+          terraform output bucket_name
