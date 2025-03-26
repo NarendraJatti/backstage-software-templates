@@ -7,17 +7,24 @@ terraform {
   }
 }
 
+variable "bucket_name" {
+  type = string
+}
+
+variable "versioning_enabled" {
+  type    = bool
+  default = false
+}
+
 provider "aws" {
-  region     = "us-east-1"
-  access_key = "AKIA3IJ74JHWC62ZBTCH"       # Hardcoded credentials (INSECURE)
-  secret_key = "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" # Hardcoded credentials (INSECURE)
+  region = "us-east-1"
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "my-unique-bucket-name-12345" # Hardcoded bucket name
+  bucket = var.bucket_name
 
   tags = {
-    Name        = "my-production-bucket"
+    Name        = var.bucket_name
     Environment = "Production"
     ManagedBy   = "Backstage"
   }
@@ -26,7 +33,7 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_bucket_versioning" "this" {
   bucket = aws_s3_bucket.this.id
   versioning_configuration {
-    status = "Enabled" # Hardcoded versioning setting
+    status = var.versioning_enabled ? "Enabled" : "Disabled"
   }
 }
 
