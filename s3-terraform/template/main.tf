@@ -19,8 +19,8 @@ variable "versioning_enabled" {
 
 provider "aws" {
   region     = "us-east-1"
-  access_key = "AKIA6GBMFAZTZ5NBZWBS"       # ⚠️ Remove in production
-  secret_key = "dk/pdDtHUvNiD8VlDIq/FfnJGgMT4RMYkYRvuFWk" # ⚠️ Remove in production
+  access_key = "AKIA5FTZCHRIK6RJOAM2"       # ⚠️ Remove in production
+  secret_key = "eAIpryC4uluKue0knB1RLM/QmGg97O0E4MSnz//3" # ⚠️ Remove in production
 }
 
 resource "aws_s3_bucket" "this" {
