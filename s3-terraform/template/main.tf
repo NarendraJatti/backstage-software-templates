@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "my-unique-bucket-name-12345"  # Hardcoded bucket name
+  bucket = "my-unique-bucket-name-12345" # Hardcoded bucket name
 
   tags = {
     Name        = "my-production-bucket"
@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_bucket_versioning" "this" {
   bucket = aws_s3_bucket.this.id
   versioning_configuration {
-    status = "Enabled"  # Hardcoded versioning setting
+    status = "Enabled" # Hardcoded versioning setting
   }
 }
 
