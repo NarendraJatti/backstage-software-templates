@@ -1,20 +1,15 @@
 name: Terraform S3 Bucket Deployment
 
 on:
-  workflow_dispatch: {}  # Allow manual triggers
+  workflow_dispatch: {}
   push:
-    branches: [ "master" ]  # Match your default branch
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
-permissions:
-  id-token: write  # For OIDC (preferred)
-  contents: read   # To checkout code
-  actions: write   # To dispatch workflows (if chaining)
-
 env:
-  TF_VERSION: "1.6.0"  # Terraform version
-  AWS_REGION: "us-east-1"  # Default region
+  TF_VERSION: "1.6.0"
+  AWS_REGION: "us-east-1"
 
 jobs:
   terraform:
@@ -23,47 +18,35 @@ jobs:
     environment: production
 
     steps:
-      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Install Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.6.0"
+          terraform_version: "${{ env.TF_VERSION }}"
 
-      # Initialize Terraform
       - name: Terraform Init
         id: init
         run: terraform init -input=false
-        env:
-          AWS_ACCESS_KEY_ID: "AKIA3IJ74JHWC62ZBTCH"       # ⚠️ Exposed for testing purposes
-          AWS_SECRET_ACCESS_KEY: "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG" # ⚠️ Exposed for testing purposes
 
-      # Check formatting
       - name: Terraform Format
         id: fmt
         run: terraform fmt -check -recursive
 
-      # Validate config
       - name: Terraform Validate
         id: validate
         run: terraform validate
 
-      # Generate execution plan
       - name: Terraform Plan
         id: plan
         run: |
-          terraform plan -no-color -input=false -out=tfplan
-        env:
-          AWS_ACCESS_KEY_ID: "AKIA3IJ74JHWC62ZBTCH"       # ⚠️ Exposed for testing purposes
-          AWS_SECRET_ACCESS_KEY: "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG" # ⚠️ Exposed for testing purposes
+          terraform plan \
+            -var="bucket_name=${{ vars.BUCKET_NAME }}" \
+            -var="region=${{ env.AWS_REGION }}" \
+            -var="versioning_enabled=${{ vars.VERSIONING_ENABLED || 'false' }}" \
+            -no-color -input=false -out=tfplan
 
-      # Apply changes (only on master push)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false tfplan
-        env:
-          AWS_ACCESS_KEY_ID: "AKIA3IJ74JHWC62ZBTCH"       # ⚠️ Exposed for testing purposes
-          AWS_SECRET_ACCESS_KEY: "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG" # ⚠️ Exposed for testing purposes
