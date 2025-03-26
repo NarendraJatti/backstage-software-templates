@@ -24,7 +24,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = var.bucket_name  # ← Use Terraform variable
+  bucket = var.s3_bucket_name  # ← Use Terraform variable
   
   tags = {
     Name        = var.bucket_name
