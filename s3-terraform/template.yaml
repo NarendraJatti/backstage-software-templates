@@ -74,7 +74,7 @@ spec:
         requireCodeOwnerReviews: false
         defaultBranch: "master"  # Explicitly set default branch to main
         protectDefaultBranch: false 
-        # repoVisibility: public
+        repoVisibility: public
 
     # - id: verify-workflow
     #   name: Verify Workflow Exists
