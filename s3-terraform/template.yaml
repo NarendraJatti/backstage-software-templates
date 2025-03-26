@@ -73,6 +73,7 @@ spec:
         repoUrl: ${{ parameters.repo_url }}
         requireCodeOwnerReviews: false
         defaultBranch: "master"  # Explicitly set default branch to main
+        repoVisibility: public
 
     # - id: verify-workflow
     #   name: Verify Workflow Exists
