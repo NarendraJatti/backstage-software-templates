@@ -17,14 +17,12 @@ variable "versioning_enabled" {
 }
 
 provider "aws" {
-  region     = "us-east-1"
-  access_key = "AKIA3IJ74JHWC62ZBTCH"       # ⚠️ Exposed for testing purposes
-  secret_key = "ZWGpVFK43DzIob8KEIAbpK6T99XzLmCmGVXFC9RG" # ⚠️ Exposed for testing purposes
+  region = "us-east-1"
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = var.s3_bucket_name
-  
+  bucket = var.bucket_name
+
   tags = {
     Name        = var.bucket_name
     Environment = "Production"
@@ -40,7 +38,7 @@ resource "aws_s3_bucket_versioning" "this" {
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
-  bucket = aws_s3_bucket.this.id
+  bucket                  = aws_s3_bucket.this.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
