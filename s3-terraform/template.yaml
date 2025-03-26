@@ -71,15 +71,26 @@ spec:
         allowedHosts: ['github.com']
         description: "Terraform configuration for S3 bucket ${{ parameters.bucket_name }}"
         repoUrl: ${{ parameters.repo_url }}
+        requireCodeOwnerReviews: false
+        defaultBranch: "main"  # Explicitly set default branch to main
+
+    - id: verify-workflow
+      name: Verify Workflow Exists
+      action: github:actions:list
+      input:
+        repoUrl: ${{ steps.publish.output.repoUrl }}
+        branch: "main"  # Check the main branch
 
     - id: github-actions
       name: Add GitHub Actions
       action: github:actions:dispatch
       input:
-        repoUrl: ${{ parameters.repo_url }} 
-        workflowId: "terraform"
-        branchOrTagName: "master"
-        
+        repoUrl: ${{ steps.publish.output.repoUrl }} 
+        workflowId: "terraform.yml"  # Must include .yml extension
+        branchOrTagName: "main"  # Changed from master to main
+        # Optional: Add inputs if your workflow accepts them
+        # inputs:
+        #   environment: "dev"
 
   output:
     links:
@@ -87,3 +98,5 @@ spec:
         url: ${{ steps.publish.output.remoteUrl }}
       - title: Open in GitHub
         url: ${{ steps.publish.output.remoteUrl }}/blob/main/README.md
+      - title: View Workflow Runs
+        url: ${{ steps.publish.output.remoteUrl }}/actions
