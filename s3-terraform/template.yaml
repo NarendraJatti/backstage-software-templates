@@ -70,7 +70,7 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: "Terraform configuration for S3 bucket ${{ parameters.bucket_name }}"
-        repoUrl: github.com/NarendraJatti/${{parameters.component_id}}
+        repoUrl: ${{ parameters.repo_url }}
         requireCodeOwnerReviews: false
         defaultBranch: "master"  # Explicitly set default branch to main
         protectDefaultBranch: false 
