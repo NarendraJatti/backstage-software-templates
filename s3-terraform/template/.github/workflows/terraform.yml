@@ -1,33 +1,30 @@
-name: Terraform S3 Bucket Deployment
+name: List S3 with Terraform
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [ "master" ]
 
 jobs:
-  terraform:
-    name: "Terraform Plan & Apply"
+  list-buckets:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.6.0"
+          terraform-version: "1.6.0"
 
-      - name: Terraform Init
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+
+      - name: Initialize
         run: terraform init
 
-      - name: Terraform Format
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Plan
-        run: terraform plan
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve
+      - name: List buckets
+        run: |
+          terraform plan -no-color
+          echo "Buckets:"
+          terraform output -json bucket_list | jq -r '.[]'
