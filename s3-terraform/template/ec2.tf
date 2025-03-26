@@ -1,7 +1,7 @@
 resource "aws_instance" "web_server" {
   ami           = "ami-0c7217cdde317cfec"  # Amazon Linux 2023 AMI in us-east-1
   instance_type = "t2.micro"
-  key_name      = "your-key-pair-name"     # Replace with your EC2 key pair name
+  key_name      = "demo4"     # Replace with your EC2 key pair name
 
   tags = {
     Name        = "BackstageWebServer"
