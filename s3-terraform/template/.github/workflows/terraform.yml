@@ -4,18 +4,11 @@ on:
   workflow_dispatch: {}
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-env:
-  TF_VERSION: "1.6.0"
-  AWS_REGION: "us-east-1"
 
 jobs:
   terraform:
     name: "Terraform Plan & Apply"
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       - name: Checkout repository
@@ -24,29 +17,17 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "${{ env.TF_VERSION }}"
+          terraform_version: "1.6.0"
 
       - name: Terraform Init
-        id: init
-        run: terraform init -input=false
+        run: terraform init
 
       - name: Terraform Format
-        id: fmt
         run: terraform fmt -check -recursive
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-
       - name: Terraform Plan
-        id: plan
-        run: |
-          terraform plan \
-            -var="bucket_name=${{ vars.BUCKET_NAME }}" \
-            -var="region=${{ env.AWS_REGION }}" \
-            -var="versioning_enabled=${{ vars.VERSIONING_ENABLED || 'false' }}" \
-            -no-color -input=false -out=tfplan
+        run: terraform plan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false tfplan
+        run: terraform apply -auto-approve
