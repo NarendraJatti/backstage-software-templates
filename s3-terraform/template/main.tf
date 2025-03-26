@@ -9,15 +9,13 @@ terraform {
 
 provider "aws" {
   region = var.region
-  access_key = "AKIA3IJ74JHWC62ZBTCH"
-  secret_key = "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"
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "my-unique-bucket-name-12345-naren"
+  bucket = var.bucket_name
 
   tags = {
-    Name        = "my-production-bucket"
+    Name        = var.bucket_name
     Environment = "Production"
     ManagedBy   = "Backstage"
   }
