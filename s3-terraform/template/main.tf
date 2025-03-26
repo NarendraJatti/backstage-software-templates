@@ -7,17 +7,8 @@ terraform {
   }
 }
 
-variable "bucket_name" {
-  type = string
-}
-
-variable "versioning_enabled" {
-  type    = bool
-  default = false
-}
-
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 resource "aws_s3_bucket" "this" {
