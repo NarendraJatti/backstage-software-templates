@@ -85,7 +85,8 @@ spec:
       name: Add GitHub Actions
       action: github:actions:dispatch
       input:
-        repoUrl: ${{ steps.publish.output.repoUrl }} 
+        # repoUrl: ${{ steps.publish.output.repoUrl }} 
+        repoUrl: ${{ steps.publish.output.remoteUrl }}
         workflowId: "terraform.yml"  # Must include .yml extension
         branchOrTagName: "master"  # Changed from master to main
         # Optional: Add inputs if your workflow accepts them
