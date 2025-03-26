@@ -73,7 +73,7 @@ spec:
         repoUrl: github.com?owner=NarendraJatti&repo=${{parameters.component_id}}
         requireCodeOwnerReviews: false
         defaultBranch: "master"  # Explicitly set default branch to main
-        repoVisibility: public
+        # repoVisibility: public
 
     # - id: verify-workflow
     #   name: Verify Workflow Exists
