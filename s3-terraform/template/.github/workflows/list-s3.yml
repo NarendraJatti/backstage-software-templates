@@ -1,0 +1,19 @@
+name: List S3 Buckets
+
+on:
+  workflow_dispatch: {}  # Manual trigger
+  push:
+    branches: [ main, master ]  # Auto-trigger on push
+
+jobs:
+  list-buckets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        env:
+          AWS_ACCESS_KEY_ID: "AKIA3IJ74JHWC62ZBTCH"
+          AWS_SECRET_ACCESS_KEY: "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"
+          AWS_REGION: "us-east-1"
+        run: |
+          echo "=== S3 Bucket List ==="
+          aws s3 ls
